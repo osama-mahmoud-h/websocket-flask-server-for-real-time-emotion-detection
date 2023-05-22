@@ -1,4 +1,4 @@
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask import Flask, request,jsonify
 from flask_cors import CORS
 
@@ -8,6 +8,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 
+#socketio
+#from websocket_services.socketio_handler import socketio_handler
+from websocket_services.users import add_new_user, remove_user, get_users_count
+import websocket_services.users as users
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -25,46 +29,32 @@ def http_call():
     data = {'data':'This text was fetched using an HTTP call to server on render'}
     return jsonify(data)
 
-@socketio.on("connect")
-def connected():
-    """event listener when client connects to the server"""
-    print("socket_id: ",request.sid)
-    print("client has connected")
-    emit("connect",{"data":f"id: {request.sid} is connected"})
 
-@socketio.on('data')
-def handle_message(data):
-    """event listener when client types a message"""
-    print("data from the front end: ",str(data))
-    emit("data",{'data':data,'id':request.sid},broadcast=True)
+#socketio_handler(socketio)
+@socketio.on('connect')
+def handle_connect():
+    socket_id = request.sid
+    add_new_user(socket_id)
+    #join_room(socket_id)
+    emit("connect",{"data":f"id: {socket_id} is connected"},to=socket_id)
+    print(f"======>Client:'{socket_id}' connected. , users count: ",get_users_count())
 
-@socketio.on("disconnect")
-def disconnected():
-    """event listener when client disconnects to the server"""
-    print("user disconnected")
-    emit("disconnect",f"user {request.sid} disconnected",broadcast=True)
-   
+@socketio.on('disconnect')
+def handle_disconnect():
+    request_id = request.sid
+    remove_user(request_id)
+    print("---------->Client disconnected. ",request_id +" , users count: ",get_users_count())
 
+@socketio.on("predict_image")
+def handle_image_prediction(data):
+    print("predict_image: ", data)
+    return True
 
-@socketio.on("file")
-def readfile(file):
-   # read the binary string data
-   filedata = file['fileData']
-
-  # Decode the binary data using OpenCV
-   img_array = np.frombuffer(filedata, np.uint8)
-   img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
-
-   # Create an empty frame with the same dimensions as the image
-   frame = np.zeros((img.shape[0], img.shape[1], 3), np.uint8)
-
-   # Assign the image to the frame
-   frame[:, :, :] = img[:, :, :]
-   #print("file: ",file)
-   ret, buffer = cv2.imencode('.jpg', frame)
-   frame = buffer.tobytes()
-   print("file processed sucsuflly.............................")
-   emit("result_file",{"image":frame})
+@socketio.on("get_final_result")
+def get_final_result(socket_id):
+    request_id = request.sid
+    emit("get_final_result",users.get_user_emotions,to=request_id)
+    return True
 
 
 if __name__ == '__main__':
