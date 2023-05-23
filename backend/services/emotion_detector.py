@@ -3,10 +3,7 @@ import numpy as np
 from tensorflow.keras.preprocessing import image 
 
 class emotion_detector:
-    def __init__(self,file_data):
-        self.file_data = file_data
-    
-    def gen_frames(img ,model,face_haar_cascade,frame):  # generate frame by frame from camera
+    def gen_frame_and_emotion(model,face_haar_cascade,frame):  # generate frame by frame from camera
         # Capture frame by frame
             gray_img= cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  
         
@@ -40,6 +37,6 @@ class emotion_detector:
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
 
-            return frame
+            return frame, predicted_emotion
 
 
