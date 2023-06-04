@@ -13,6 +13,9 @@ from PIL import Image
 from websocket_services.users import add_new_user, remove_user, get_users_count
 import websocket_services.users as users
 
+#ai model
+import services.main as ai_detector
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 CORS(app,resources={r"/*":{"origins":"*"}})
@@ -47,14 +50,44 @@ def handle_disconnect():
 
 @socketio.on("predict_image")
 def handle_image_prediction(data):
+    socket_id = request.sid
+    
+    image,emotion = ai_detector.get_predicted_image_emotion(data)
+
+    #increase emotion detected
+    users.increase_user_emotion(socket_id=socket_id,emotion=emotion)
+    
+    #emit result to user
+    emit("result_file",{"image":image}, to = socket_id)
+    
     print("predict_image: ", data)
     return True
 
 @socketio.on("get_final_result")
-def get_final_result(socket_id):
-    request_id = request.sid
-    emit("get_final_result",users.get_user_emotions,to=request_id)
+def get_final_result():
+    socket_id = request.sid
+    emit("get_final_result",users.get_user_emotions(),to=socket_id)
     return True
+
+@socketio.on("file")
+def readfile(file):
+   # read the binary string data
+   filedata = file['fileData']
+
+  # Decode the binary data using OpenCV
+   img_array = np.frombuffer(filedata, np.uint8)
+   img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+
+   # Create an empty frame with the same dimensions as the image
+   frame = np.zeros((img.shape[0], img.shape[1], 3), np.uint8)
+
+   # Assign the image to the frame
+   frame[:, :, :] = img[:, :, :]
+   #print("file: ",file)
+   ret, buffer = cv2.imencode('.jpg', frame)
+   frame = buffer.tobytes()
+   print("file processed sucsuflly.............................")
+   emit("result_file",{"image":frame})
 
 
 if __name__ == '__main__':

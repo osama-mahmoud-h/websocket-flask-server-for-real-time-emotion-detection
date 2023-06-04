@@ -1,4 +1,5 @@
 
+"""
 users = {}
 
 id = "1234"
@@ -17,3 +18,5 @@ print (len(users))
 # Print the updated counts
 for user, emoticons in users.items():
     print(f"{user}: {emoticons}")
+"""
+
