@@ -55,7 +55,7 @@ function App() {
   const handleSubmit = (event) => {
     event.preventDefault();
     
-    socket.current.emit("file",{
+    socket.current.emit("predict_image",{
       fileData
     });
     console.log("file read: ",fileData);

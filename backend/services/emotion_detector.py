@@ -3,10 +3,11 @@ import numpy as np
 from tensorflow.keras.preprocessing import image 
 
 class emotion_detector:
-    def gen_frame_and_emotion(model,face_haar_cascade,frame):  # generate frame by frame from camera
+    def gen_frame_and_emotion(self,model,face_haar_cascade,frame):  # generate frame by frame from camera
         # Capture frame by frame
-            gray_img= cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  
-        
+            gray_img= cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            print("gray_image: ", gray_img)
+            #faces_detected = face_haar_cascade.detectMultiScale(gray_img, 1.32, 5)  
             faces_detected = face_haar_cascade.detectMultiScale(gray_img, 1.32, 5)  
             
         
@@ -29,12 +30,16 @@ class emotion_detector:
         
                 emotions = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral']  
                 predicted_emotion = emotions[max_index]  
-                print(predicted_emotion)
-                cv2.putText(frame, predicted_emotion, (int(x), int(y)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)  
+                print("predicted_emotion ",predicted_emotion)
+                cv2.putText(frame, predicted_emotion, (int(x), int(y)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,225,0), 2)  
         
             resized_img = cv2.resize(frame, (1000, 700))  
             
-            ret, buffer = cv2.imencode('.jpg', frame)
+            print(frame.dtype)
+            print(frame.shape)
+            #print("frame : ",frame)
+            frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            ret, buffer = cv2.imencode('.jpg',frame_bgr)
             frame = buffer.tobytes()
 
             return frame, predicted_emotion

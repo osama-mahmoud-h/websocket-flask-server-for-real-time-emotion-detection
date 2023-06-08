@@ -4,9 +4,11 @@ import numpy as np
 
 class image_processing:
      
-    def convert_imageArr_to_frame(file):
+    def convert_imageArr_to_frame(self,file):
          # read the binary string data
         filedata = file['fileData']
+
+        #print("file data, ",filedata)
 
         # Decode the binary data using OpenCV
         img_array = np.frombuffer(filedata, np.uint8)
@@ -19,8 +21,9 @@ class image_processing:
         frame[:, :, :] = img[:, :, :]
         return frame
      
-    def convert_frame_to_bytes(frame):
+    def convert_frame_to_bytes(self,frame):
          #print("file: ",file)
-        ret, buffer = cv2.imencode('.jpg', frame)
+        frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        ret, buffer = cv2.imencode('.jpg', frame_bgr)
         frame = buffer.tobytes()
         return frame
