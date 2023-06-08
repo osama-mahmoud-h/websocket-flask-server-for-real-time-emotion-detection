@@ -9,7 +9,7 @@
 ### mock examples:
 ![Alt Text](imgs/happy-man.png)
 
-![Alt Text](imgs/Screenshot from 2023-06-08 07-20-10.png)
+![Alt Text](imgs/Screenshot-from-2023-06-08-07-20-10.png)
 
-![Alt Text](imgs/Screenshot from 2023-06-08 07-20-41.png)
+![Alt Text](imgs/Screenshot-from-2023-06-08-07-20-41.png)
 
