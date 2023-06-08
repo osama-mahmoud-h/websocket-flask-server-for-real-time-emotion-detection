@@ -7,7 +7,7 @@
 ### TODO :(setup camera in client and send frames to server)
 
 ### mock examples:
-![Alt Text](imgs/Screenshot from 2023-06-07 19-14-54.png)
+![Alt Text](imgs/happy-man.png)
 
 ![Alt Text](imgs/Screenshot from 2023-06-08 07-20-10.png)
 
